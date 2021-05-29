@@ -32,13 +32,13 @@ public class LootSplitterPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Loot Splitter started!");
+		log.debug("Loot Splitter started!");
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		log.info("Loot Splitter stopped!");
+		log.debug("Loot Splitter stopped!");
 	}
 
 	@Subscribe
@@ -53,12 +53,10 @@ public class LootSplitterPlugin extends Plugin
 				if(countOccurences(messageReceived,'(',0) <= 1){ //Checking how many ('s are in the string (should be one, can be two).
 					final String coinMessage = messageReceived.substring(messageReceived.indexOf("(") + 1, messageReceived.indexOf(" coins"));
 					final int coinValue = Integer.parseInt(coinMessage.replaceAll(",", ""));
-					System.out.println("Total GP: " + coinValue);
 					final int split = (coinValue / (config.numOfPlayers()+1));
 					if(config.printGP()){
 						client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "GP split for " + config.numOfPlayers() + " other player(s) is" +"<col=22ff00> "+ String.format ("%,d", split) + "<col=ef1020>gp", null);
 					}
-					System.out.println(String.format ("%,d", split));
 					if (!messageReceived.contains(" x ")) { //Single item drops don't need quantity split.
 
 					} else {
@@ -72,12 +70,10 @@ public class LootSplitterPlugin extends Plugin
 				} else { //If two parentheses within the text (as in drop has it Dragon Bolts (unf) for example) we skip the first one!
 					final String coinMessage = messageReceived.substring(messageReceived.indexOf("(", messageReceived.indexOf("(")+ 1) + 1, messageReceived.indexOf(" coins"));
 					final int coinValue = Integer.parseInt(coinMessage.replaceAll(",", ""));
-					System.out.println("Total GP: " + coinValue);
 					final int split = (coinValue / (config.numOfPlayers()+1));
 					if(config.printGP()){
 						client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "GP split for " + config.numOfPlayers() + " other player(s) is" +"<col=22ff00> "+ String.format ("%,d", split) + "<col=ef1020>gp", null);
 					}
-					System.out.println(String.format ("%,d", split));
 					if (!messageReceived.contains(" x ")) { //Single item drops don't need quantity split.
 
 					} else {
