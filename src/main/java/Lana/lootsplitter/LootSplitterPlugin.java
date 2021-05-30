@@ -10,9 +10,6 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,51 +41,62 @@ public class LootSplitterPlugin extends Plugin
 	@Subscribe
 	public void onChatMessage(ChatMessage chatMessage)
 	{
-
-		if(config.numOfPlayers() >= 1) {
-
+		String arr[] = new String[3];
+		if(config.numOfPlayers() >= 1 ) {
 			final String messageReceived = chatMessage.getMessage();
-
 			if (messageReceived.contains("<col=ef1020>Valuable drop:")&&chatMessage.getType() == ChatMessageType.GAMEMESSAGE) {
-				if(countOccurences(messageReceived,'(',0) <= 1){ //Checking how many ('s are in the string (should be one, can be two).
-					final String coinMessage = messageReceived.substring(messageReceived.indexOf("(") + 1, messageReceived.indexOf(" coins"));
-					final int coinValue = Integer.parseInt(coinMessage.replaceAll(",", ""));
-					final int split = (coinValue / (config.numOfPlayers()+1));
+				System.out.println("HERHEHR");
+				messageReceived.replaceAll("<col=ef1020>","");
+
+				if(messageReceived.contains(" x ")) { //The X determines if the drop was a single quantity drop or not.
+					Pattern p = Pattern.compile("\\d+|(?<= x )(.*)(?=\\()");
+					Matcher m = p.matcher(messageReceived);
+					int i = 0;
+					while(m.find()) {
+						// Either its single drop or multiple item drop depending on which value gets assigned where in the array
+						// arr[0] - Item Stack Size
+						// arr[1] - Item Name
+						// arr[2] - Total GP
+						arr[i] = m.group();
+						i++;
+					}
+					final int split = (Integer.parseInt(arr[2]) / (config.numOfPlayers()+1));
+					final String itemName = arr[1];
+					final int itemQuantity = Integer.parseInt(arr[0]);
 					if(config.printGP()){
 						client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "GP split for " + config.numOfPlayers() + " other player(s) is" +"<col=22ff00> "+ String.format ("%,d", split) + "<col=ef1020>gp", null);
 					}
-					if (!messageReceived.contains(" x ")) { //Single item drops don't need quantity split.
 
-					} else {
-						final String items = messageReceived.substring(messageReceived.indexOf(":") + 1, messageReceived.indexOf("(") - 1);
-						final String itemName = items.substring(items.indexOf("x") + 1);
-						final String itemQuantity = items.substring(0, items.indexOf("x"));
 						if(config.printItemAmt()){
-							client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "Item split for " + config.numOfPlayers() + " other player(s) of" + itemName + " is: <col=22ff00>" + (Integer.parseInt(itemQuantity.replaceAll(" ", "")) / (config.numOfPlayers()+1)), null);
+							client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "Item split for " + config.numOfPlayers() + " other player(s) of" + itemName + " is: <col=22ff00>" + (itemQuantity / (config.numOfPlayers()+1)), null);
 						}
 					}
-				} else { //If two parentheses within the text (as in drop has it Dragon Bolts (unf) for example) we skip the first one!
-					final String coinMessage = messageReceived.substring(messageReceived.indexOf("(", messageReceived.indexOf("(")+ 1) + 1, messageReceived.indexOf(" coins"));
-					final int coinValue = Integer.parseInt(coinMessage.replaceAll(",", ""));
-					final int split = (coinValue / (config.numOfPlayers()+1));
-					if(config.printGP()){
-						client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "GP split for " + config.numOfPlayers() + " other player(s) is" +"<col=22ff00> "+ String.format ("%,d", split) + "<col=ef1020>gp", null);
-					}
-					if (!messageReceived.contains(" x ")) { //Single item drops don't need quantity split.
 
-					} else {
-						final String items = messageReceived.substring(messageReceived.indexOf(":") + 1, messageReceived.indexOf("(") - 1);
-						final String itemName = items.substring(items.indexOf("x") + 1);
-						final String itemQuantity = items.substring(0, items.indexOf("x"));
-						if(config.printItemAmt()){
-							client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "Item split for " + config.numOfPlayers() + " other player(s) of" + itemName + " is: <col=22ff00>" + (Integer.parseInt(itemQuantity.replaceAll(" ", "")) / (config.numOfPlayers()+1)), null);
-						}
+				//For drops with one item
+				 else {
+					Pattern p = Pattern.compile("\\d+|(?<=Valuable Drop: )(.*)(?=\\()");
+					Matcher m = p.matcher(messageReceived);
+					int i = 0;
+					while (m.find() && i < 4) {
+						//arr[0] - name
+						//arr[1] - gp value
+						System.out.println(m.group());
+						arr[i] = m.group();
+						i++;
 					}
+
+					final String itemName = arr[0];
+					final int split = (Integer.parseInt(arr[1]) / config.numOfPlayers() + 1);
+
+					if (config.printGP()) {
+						client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "GP split for " + config.numOfPlayers() + " other player(s) is" + "<col=22ff00> " + String.format("%,d", split) + "<col=ef1020>gp", null);
+					}
+				}
 				}
 
 			}
 		}
-	}
+
 	private static int countOccurences(
 			String someString, char searchedChar, int index) {
 		if (index >= someString.length()) {
