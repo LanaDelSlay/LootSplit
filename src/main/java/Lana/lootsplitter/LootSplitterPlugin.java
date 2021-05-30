@@ -45,7 +45,6 @@ public class LootSplitterPlugin extends Plugin
 		if(config.numOfPlayers() >= 1 ) {
 			final String messageReceived = chatMessage.getMessage();
 			if (messageReceived.contains("<col=ef1020>Valuable drop:")&&chatMessage.getType() == ChatMessageType.GAMEMESSAGE) {
-				System.out.println("HERHEHR");
 				messageReceived.replaceAll("<col=ef1020>","");
 
 				if(messageReceived.contains(" x ")) { //The X determines if the drop was a single quantity drop or not.
@@ -80,7 +79,6 @@ public class LootSplitterPlugin extends Plugin
 					while (m.find() && i < 4) {
 						//arr[0] - name
 						//arr[1] - gp value
-						System.out.println(m.group());
 						arr[i] = m.group();
 						i++;
 					}
