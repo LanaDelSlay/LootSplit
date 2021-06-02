@@ -3,7 +3,6 @@ package Lana.lootsplitter;
 import com.google.inject.Provides;
 
 import javax.inject.Inject;
-
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -32,11 +31,9 @@ public class LootSplitterPlugin extends Plugin {
 	@Inject
 	private OverlayManager overlayManager;
 
-	@Inject
-	private LootSplitterOverlay lootOverlay;
 
-	@Inject
-    private LootSplitterOverlay lootOverlayTwo;
+    @Inject
+    private LootSplitterPlugin plugin;
 
     @Override
     protected void startUp() throws Exception {
@@ -54,15 +51,17 @@ public class LootSplitterPlugin extends Plugin {
     Boolean firstMenuDisplayed = false;
     Boolean secondMenuDisplayed = false;
 
+
+
     @Subscribe
     public void onChatMessage(ChatMessage chatMessage) {
-        String[] arr = new String[5];
+        String[] arr = new String[3];
+
         if (config.numOfPlayers() >= 1) {
-            final String messageReceived = chatMessage.getMessage().replace(",","");
+             String messageReceived = chatMessage.getMessage().replace(",","");
             if (messageReceived.contains("<col=ef1020>Valuable drop:") && chatMessage.getType() == ChatMessageType.GAMEMESSAGE) {
-
-                messageReceived.replaceAll("<col=ef1020>", "");
-
+            //if (messageReceived.contains("Valuable drop:")) {
+                messageReceived = messageReceived.substring(11); //removes color
                 if (messageReceived.contains(" x ")) { //The X determines if the drop was a single quantity drop or not.
                     Pattern p = Pattern.compile("\\d+|(?<= x )(.*)(?=\\()");
                     Matcher m = p.matcher(messageReceived);
@@ -89,6 +88,8 @@ public class LootSplitterPlugin extends Plugin {
                         client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "Item split for " + config.numOfPlayers() + " other player(s) of " + itemName + " is: <col=22ff00>" + (itemQuantity / (config.numOfPlayers() + 1)), null);
                     }
                     if(config.showMenu() == true && firstMenuDisplayed == false) {
+
+                        LootSplitterOverlay lootOverlay = new LootSplitterOverlay(gpValue, quantity, itemNameStr);
                         overlayManager.add(lootOverlay);
                         new java.util.Timer().schedule(
                                 new java.util.TimerTask() {
@@ -102,12 +103,19 @@ public class LootSplitterPlugin extends Plugin {
                         );
                         firstMenuDisplayed = true;
                     } else if(config.showMenu() && firstMenuDisplayed) {
-                        overlayManager.add(lootOverlayTwo);
+
+                        LootSplitterOverlay lso = new LootSplitterOverlay(gpValue, quantity, itemNameStr){
+                            public String getName() {
+                                return "LootSplitTwo";
+                            }
+                        };
+
+                        overlayManager.add(lso);
                         new java.util.Timer().schedule(
                                 new java.util.TimerTask() {
                                     @Override
                                     public void run() {
-                                        overlayManager.remove(lootOverlayTwo);
+                                        overlayManager.remove(lso);
                                         secondMenuDisplayed = false;
                                     }
                                 },
@@ -140,6 +148,8 @@ public class LootSplitterPlugin extends Plugin {
                         client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "GP split for " + config.numOfPlayers() + " other player(s) is" + "<col=22ff00> " + String.format("%,d", split) + "<col=ef1020>gp", null);
                     }
                     if(config.showMenu() && !firstMenuDisplayed) {
+                        LootSplitterOverlay lootOverlay = new LootSplitterOverlay(gpValue, quantity, itemNameStr);
+
                         overlayManager.add(lootOverlay);
                         firstMenuDisplayed = true;
                         new java.util.Timer().schedule(
@@ -153,12 +163,17 @@ public class LootSplitterPlugin extends Plugin {
                                 (config.menuTimeout()*1000)
                         );
                     } else if(config.showMenu() && firstMenuDisplayed) {
-                        overlayManager.add(lootOverlayTwo);
+                        LootSplitterOverlay lso = new LootSplitterOverlay(gpValue, quantity, itemNameStr){
+                            public String getName() {
+                                return "LootSplitTwo";
+                            }
+                        };
+                        overlayManager.add(lso);
                         new java.util.Timer().schedule(
                                 new java.util.TimerTask() {
                                     @Override
                                     public void run() {
-                                        overlayManager.remove(lootOverlayTwo);
+                                        overlayManager.remove(lso);
                                         secondMenuDisplayed = false;
                                     }
                                 },
@@ -185,4 +200,5 @@ public class LootSplitterPlugin extends Plugin {
     LootSplitterConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(LootSplitterConfig.class);
     }
+
 }
