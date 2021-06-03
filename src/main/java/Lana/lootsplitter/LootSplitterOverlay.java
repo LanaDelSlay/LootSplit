@@ -28,7 +28,6 @@ public class LootSplitterOverlay extends OverlayPanel {
 
         setPosition(OverlayPosition.TOP_LEFT);
         setPriority(OverlayPriority.LOW);
-
     }
 
 

@@ -18,7 +18,10 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Loot Splitter"
+        name = "Loot Splitter",
+        description = "A plugin to tell you how much to split when bossing with friends.",
+        tags = {"bossing","split", "duo", "trio"},
+        enabledByDefault = true
 )
 public class LootSplitterPlugin extends Plugin {
 
