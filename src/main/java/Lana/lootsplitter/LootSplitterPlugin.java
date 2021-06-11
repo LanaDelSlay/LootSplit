@@ -84,11 +84,11 @@ public class LootSplitterPlugin extends Plugin {
                     quantity = itemQuantity / 2;
                     itemNameStr = itemName;
                     if (config.printGP()) {
-                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "GP split for " + config.numOfPlayers() + " other player(s) is" + "<col=22ff00> " + String.format("%,d", split) + "<col=ef1020>gp", null);
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=FFFFFF>" + "GP split for " + config.numOfPlayers() + " other player(s) is" + "<col=ef1020> " + String.format("%,d", split) + "<col=ef1020>gp", null);
                     }
 
                     if (config.printItemAmt()) {
-                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=ef1020>" + "Item split for " + config.numOfPlayers() + " other player(s) of " + itemName + " is: <col=22ff00>" + (itemQuantity / (config.numOfPlayers() + 1)), null);
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=FFFFFF>" + "Item split for " + config.numOfPlayers() + " other player(s) of " + itemName + " is: <col=ef1020>" + (itemQuantity / (config.numOfPlayers() + 1)), null);
                     }
                     if(config.showMenu() == true && firstMenuDisplayed == false) {
 
