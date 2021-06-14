@@ -3,7 +3,7 @@ package Lana.lootsplitter;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-public class LootSplitterPluginTest
+public class runLootSplitter
 {
 	public static void main(String[] args) throws Exception
 	{

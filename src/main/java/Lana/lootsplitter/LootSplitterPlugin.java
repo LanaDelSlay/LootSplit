@@ -81,7 +81,7 @@ public class LootSplitterPlugin extends Plugin {
                     final String itemName = arr[1];
                     final int itemQuantity = Integer.parseInt(arr[0]);
                     gpValue = split;
-                    quantity = itemQuantity / 2;
+                    quantity = itemQuantity / config.numOfPlayers()+1;
                     itemNameStr = itemName;
                     if (config.printGP()) {
                         client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "<col=FFFFFF>" + "GP split for " + config.numOfPlayers() + " other player(s) is" + "<col=ef1020> " + String.format("%,d", split) + "<col=ef1020>gp", null);
@@ -187,17 +187,8 @@ public class LootSplitterPlugin extends Plugin {
                 }
             }
 
-
-
-
         }
     }
-
-    @Subscribe
-    public void onGameTick(GameTick gameTick)
-    {
-    }
-
 
     @Provides
     LootSplitterConfig provideConfig(ConfigManager configManager) {
